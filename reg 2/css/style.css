@@ -1,0 +1,60 @@
+h3{
+  margin-top: 5px;
+  font-family: Calibri; 
+  font-size: 25pt;         
+  font-style: normal; 
+  font-weight: bold; 
+  color:#007bff;
+  text-align: center; 
+  text-decoration: underline
+}
+
+body{
+ margin-top: 5px;
+  background:#fff;
+ 
+}
+
+table{
+  max-width: 800px;
+  width: 100%;
+  height: 120%;
+  font-family: Calibri; 
+  color:#000; 
+  font-size: 11pt; 
+  font-style: normal;
+  font-weight: bold;
+  text-align:; 
+  background-color: #f2f2f2; 
+  border-collapse: collapse; 
+  border: 1px solid gray;
+  box-shadow: 1px 1px 2px rgba(0,0,0,0.125);
+  padding: 0 5px;
+ 
+}
+table.inner{
+  
+  border: 0;
+}
+
+.regform input[type="text"],select{
+
+  border:1px solid gray;
+  background: rgb(0,0,255,0.2);
+  outline: none;
+  height: 25px;
+  font-size: 16px;
+}
+
+.regform textarea{
+  background: rgb(0,0,255,0.2);
+}
+
+.error{
+  color: red;
+  padding-top: 5px;
+  float: left;
+  width: 100%;
+}
+
+
