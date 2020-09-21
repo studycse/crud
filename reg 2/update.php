@@ -1,10 +1,13 @@
+
 <?php
 
 include 'dbcon.php';
 
-if (isset($_POST['submit'])) {
-	
-	$id=$_GET['id'];
+
+
+if (isset($_POST['update'])) {
+
+$id=$_GET['id'];
 $username=$_POST['username'];
 $email=$_POST['email'];
 $address=$_POST['address'];
@@ -28,16 +31,124 @@ $msresult=$_POST['msresult'];
 $file=$_FILES['file']['name'];
 $image=$_FILES['image']['name'];
 
+		
+$updatequery= "UPDATE registertable2 SET id=$id ,username='$username' ,email='$email',address='$address',mobile='mobile',division='$division', district='$district', upozila='$upozila', language='$language', sscversity='$sscversity', sscboard='$sscboard', sscresult='$sscresult', hscversity='$hscversity', hscboard='$hscboard', hscresult='$hscresult', gdversity='$gdversity', gdboard='$gdboard', gdresult='$gdresult', msversity='$msversity', msboard='$msboard', msresult='$msresult', image='$image', file='$file' WHERE id=$id";
 
+$query= mysqli_query($connect,$updatequery);
+			
+if($query==TRUE){
+header('location:page.php');
+}else{
+echo "Error:" .$updatequery ."<br>" .$connect->error;
 
-	$query="update registertable2 set id=$id , username='$username',email='$email',address='$address',mobile='$mobile', division='$division',district='$district',upozila='$upozila',language='$language',sscversity='$sscversity',sscboard='$sscboard',sscresult='$sscresult',hscversity='$hscversity',hscboard='$hscboard',hscresult='$hscresult',gdversity='$gdversity',gdboard='$gdboard',gdresult='$gdresult',msversity='$msversity',msboard='$msboard',msresult='$msresult',image='$image',file='$file' where id=$id ";
+	}
+}
+if(isset($_GET['id'])){
 
-	$result= mysqli_query($connect,$query);
-		header('location:page.php');
+$id=$_GET['id'];
 
-		}
+$sql="SELECT * FROM registertable2 WHERE id=$id ";
+
+$result=mysqli_query($connect,$sql);
+
+if($row = mysqli_num_rows($result) > 0){
+while($row = mysqli_fetch_assoc($result)){
+
+$username=$row ['username'];
+$email=$row ['email'];
+$address=$row ['address'];
+$mobile=$row ['mobile'];
+$division=$row ['division'];
+$district=$row ['district'];
+$upozila=$row ['upozila'];
+$language=$row ['language'];
+$sscversity=$row ['sscversity'];
+$sscboard=$row ['sscboard'];
+$sscresult=$row ['sscresult'];
+$hscversity=$row ['hscversity'];
+$hscboard=$row ['hscboard'];
+$hscresult=$row ['hscresult'];
+$gdversity=$row ['gdversity'];
+$gdboard=$row ['gdboard'];
+$gdresult=$row ['gdresult'];
+$msversity=$row ['msversity'];
+$msboard=$row ['msboard'];
+$msresult=$row ['msresult'];
+$file=$row ['file'];
+$image=$row ['image'];
+$id=$row['id'];
+}
+
+}
+}
+
 
 ?>
+
+<?php
+if (isset($_GET['ref_master_id'])) {
+    $targetID = $_GET['ref_master_id'];
+    //$det='DELETE FROM `training` WHERE ref_master_id ='.$targetID;
+ //echo $targetID;
+// exit;
+    $delete="DELETE FROM training WHERE ref_master_id ='.$targetID" ;
+
+     $query= mysqli_query($connect, $delete) or die(mysql_error($connect));
+
+	 if (mysqli_query($connect, $sql))
+  	  {
+  $last_id = mysqli_insert_id($connect);
+  echo "New record created successfully. Last inserted ID is: " . $last_id;
+} else {
+  echo "Error: " . $sql . "<br>" . mysqli_error($connect);
+}
+
+ $training_name= $_POST['training_name'] ;
+ $organization = $_POST['organization'] ;
+ $details = $_POST['details'];
+
+
+ $items = array();
+
+ $size = count($training_name);
+
+ for($i = 0 ; $i < $size ; $i++){
+   $items[$i] = array(
+   	 "ref_master_id" =>  $last_id ,
+      "training_name"     => $training_name[$i], 
+      "organization"    => $organization[$i], 
+      "details"       => $details[$i]
+   );
+ }
+
+$values = array();
+foreach($items as $item){
+	//print_r($item) ;
+  $values[] = "('{$item['ref_master_id']}','{$item['training_name']}', '{$item['organization']}', '{$item['details']}')";
+
+  $a=$item['ref_master_id'];
+  $b=$item['training_name'];
+  $c=$item['organization'];
+  $d=$item['details'];
+
+    $insert="INSERT INTO training (ref_master_id,training_name,organization,details) VALUES ('$a','$b','$c','$d')";
+
+  $query= mysqli_query($connect, $insert) or die(mysql_error($connect));
+
+
+
+}
+   
+}
+
+
+
+?>
+
+
+
+
+
 
 <html>
 <head>
@@ -61,16 +172,20 @@ $image=$_FILES['image']['name'];
 
 
 <div class="regform">
-<form action="page.php" method="post" enctype="multipart/form-data">
+<form action="" method="post" enctype="multipart/form-data">
 
 
  
 <table class="table1" align="center" cellpadding = "15">
+
+
+
+
  
 <!----- First Name ---------------------------------------------------------->
 <tr>
 <td for="username"> NAME</td>
-<td><input type="text" name="username" id="username" maxlength="30"/>
+<td><input type="text" name="username" id="username" maxlength="30" value="<?php echo $username; ?>"/>
 	<?php
 	if (isset($error_msg['username'])) {
 		echo "<div class='error'>" .$error_msg['username']."</div>";
@@ -84,7 +199,7 @@ $image=$_FILES['image']['name'];
  <!----- Email Id ---------------------------------------------------------->
 <tr>
 <td>EMAIL ID</td>
-<td><input type="text" name="email" id="email" maxlength="100" /><?php
+<td><input type="text" name="email" id="email" maxlength="100" value="<?php echo $email; ?>" /><?php
 	if (isset($error_msg['email'])) {
 		echo "<div class='error'>" .$error_msg['email']."</div>";
 	}
@@ -96,7 +211,7 @@ $image=$_FILES['image']['name'];
 <!----- Address ---------------------------------------------------------->
 <tr>
 <td>ADDRESS <br /><br /><br /></td>
-<td><textarea name="address" id="address" rows="4" cols="30"></textarea>
+<td><textarea name="address" id="address" rows="4" cols="30" value="<?php echo $address; ?>"></textarea>
 <?php
 	if (isset($error_msg['address'])) {
 		echo "<div class='error'>" .$error_msg['address']."</div>";
@@ -110,7 +225,7 @@ $image=$_FILES['image']['name'];
 <tr>
 <td>MOBILE NUMBER</td>
 <td>
-<input type="text" name="mobile" id="mobile" maxlength="10" />
+<input type="text" name="mobile" id="mobile" maxlength="10" value="<?php echo $mobile; ?>"/>
 <?php
 	if (isset($error_msg['mobile'])) {
 		echo "<div class='error'>" .$error_msg['mobile']."</div>";
@@ -125,7 +240,7 @@ $image=$_FILES['image']['name'];
 <!----- Division -------------------------------------------------------->
 <tr>
 <td>Dvision:</td>
-<td><select name="division" id="division" >
+<td><select name="division" id="division" value="<?php echo $division; ?>">
 <option value="0" selected> select an option</option>
 <option value="Dhaka">Dhaka</option>
 <option value="Comilla">Comilla</option>
@@ -142,7 +257,7 @@ $image=$_FILES['image']['name'];
 <!----- District -------------------------------------------------------->
 <tr>
 <td>District:</td>
-<td><select name="district" id="district" >
+<td><select name="district" id="district" value="<?php echo $district; ?>">
 <option value="0" selected> select an option</option>
 <option value="Tangail">Tangail</option>
 <option value="Narayanganj">Narayanganj</option>
@@ -160,7 +275,7 @@ $image=$_FILES['image']['name'];
 <!----- Upozila -------------------------------------------------------->
 <tr>
 <td>Upozila:</td>
-<td><select name="upozila" id="upozila" >
+<td><select name="upozila" id="upozila" value="<?php echo $upozila; ?>" >
 <option value="0" selected> select an option</option>
 <option value="Donia">Donia</option>
 <option value="Dhanmondi">Dhanmondi</option>
@@ -218,21 +333,21 @@ Bangla
 <tr>
 
 <td align="center">SSC</td>
-<td><select name="sscversity" id="sscversity" >
+<td><select name="sscversity" id="sscversity" value="<?php echo $sscversity; ?>">
 <option value="0" selected> select an option</option>
 <option value="DCC">DCC</option>
 <option value="UIU">UIU</option>
 <option value="MIST">MIST</option>
 </select></td>
 
-<td><select name="sscboard" id="sscboard" >
+<td><select name="sscboard" id="sscboard" value="<?php echo $sscboard; ?>">
 <option value="0" selected> select an option</option>
 <option value="Dhaka">Dhaka</option>
 <option value="comilla">comilla</option>
 <option value="CTG">CTG</option>
 </select></td>
 
-<td><select name="sscresult" id="sscresult" >
+<td><select name="sscresult" id="sscresult" value="<?php echo $sscresult; ?>">
 <option value="0" selected> select an option</option>
 <option value="4.00">4.00</option>
 <option value="3.00">3.00</option>
@@ -243,21 +358,21 @@ Bangla
 <tr>
 
 <td align="center">HSC</td>
-<td><select name="hscversity" id="hscversity" >
+<td><select name="hscversity" id="hscversity" value="<?php echo $hscversity; ?>" >
 <option value="0" selected> select an option</option>
 <option value="DCC">DCC</option>
 <option value="UIU">UIU</option>
 <option value="MIST">MIST</option>
 </select></td>
 
-<td><select name="hscboard" id="hscboard" >
+<td><select name="hscboard" id="hscboard" value="<?php echo $hscboard; ?>">
 <option value="0" selected> select an option</option>
 <option value="Dhaka">Dhaka</option>
 <option value="comilla">comilla</option>
 <option value="CTG">CTG</option>
 </select></td>
 
-<td><select name="hscresult" id="hscresult" >
+<td><select name="hscresult" id="hscresult" value="<?php echo $hscresult; ?>">
 <option value="0" selected> select an option</option>
 <option value="4.00">4.00</option>
 <option value="3.00">3.00</option>
@@ -268,21 +383,21 @@ Bangla
 <tr>
 
 <td align="center">Graduation</td>
-<td><select name="gdversity" id="gdversity" >
+<td><select name="gdversity" id="gdversity" value="<?php echo $gdversity; ?>">
 <option value="0" selected> select an option</option>
 <option value="DCC">DCC</option>
 <option value="UIU">UIU</option>
 <option value="MIST">MIST</option>
 </select></td>
 
-<td><select name="gdboard" id="gdboard" >
+<td><select name="gdboard" id="gdboard" value="<?php echo $dboard; ?>">
 <option value="0" selected> select an option</option>
 <option value="Dhaka">Dhaka</option>
 <option value="comilla">comilla</option>
 <option value="CTG">CTG</option>
 </select></td>
 
-<td><select name="gdresult" id="gdresult" >
+<td><select name="gdresult" id="gdresult" value="<?php echo $gdresult; ?>">
 <option value="0" selected> select an option</option>
 <option value="4.00">4.00</option>
 <option value="3.00">3.00</option>
@@ -293,21 +408,21 @@ Bangla
 <tr>
 
 <td align="center">Masters</td>
-<td><select name="msversity" id="msversity" >
+<td><select name="msversity" id="msversity" value="<?php echo $msversity; ?>" >
 <option value="0" selected> select an option</option>
 <option value="DCC">DCC</option>
 <option value="UIU">UIU</option>
 <option value="MIST">MIST</option>
 </select></td>
 
-<td><select name="msboard" id="msboard">
+<td><select name="msboard" id="msboard" value="<?php echo $msboard; ?>">
 <option value="0" selected> select an option</option>
 <option value="Dhaka">Dhaka</option>
 <option value="Comilla">Comilla</option>
 <option value="CTG">CTG</option>
 </select></td>
 
-<td><select name="msresult" id="msresult" >
+<td><select name="msresult" id="msresult" value="<?php echo $msresult; ?>" >
 <option value="0" selected> select an option</option>
 <option value="4.00">4.00</option>
 <option value="3.00">3.00</option>
@@ -325,14 +440,14 @@ Bangla
 
 <tr>
 <td>PHOTO:</td>
-<td><input type="file" name="image" id="image" value="" width="23" height="23"></td>
+<td><input type="file" name="image" id="image" value="<?php echo $image; ?>" width="23" height="23"></td>
 </tr>
 
 
 <!----- Cv ---------------------------------------------------------->
 <tr>
 <td>CV:</td>
-<td><input type="file" name="file" id="file"></td>
+<td><input type="file" name="file" id="file" value="<?php echo $file; ?>"></td>
 </tr>
 
  
@@ -371,17 +486,17 @@ Bangla
 <td><input type="text" name="details[]" id="details" maxlength="30" /></td>
 </tr>
 
- 
+
 </table>
  
 </td>
 </tr>
- 
+
  
 <!----- Submit and Reset ------------------------------------------------->
 <tr>
 <td colspan="2" align="center">
-<button type="submit" name="submit" class="btn btn-primary">submit</button>
+<button type="submit" name="update" class="btn btn-primary">update</button>
 
 </td>
 </tr>
