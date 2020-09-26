@@ -26,16 +26,13 @@ $gdresult=$_POST['gdresult'];
 $msversity=$_POST['msversity'];
 $msboard=$_POST['msboard'];
 $msresult=$_POST['msresult'];
-$file=$_FILES['file']['name'];
 $image=$_FILES['image']['name'];
+$file=$_FILES['file']['name'];
 
 
 
 if (isset($_POST['submit'])) {
 	
-	
-
-
 
 if($_POST['username'] == ""){
 	$error_msg['username']= " ** Name is required";
@@ -104,12 +101,17 @@ if(empty($_POST['language'])){
 	$error_msg['language']= " ** language is required";
 }
 
-//image
-if($_FILES['image']['name']){
+// if($_FILES['image']['name']){
 	
-	move_uploaded_file($_FILES['image']['tmp_name'],"upload/$image" ); //ak image bar bar uplaod hobe na
+// 	move_uploaded_file($_FILES['image']['tmp_name'],"upload/$image" ); //ak image bar bar uplaod hobe na
 
-}
+// }
+//image
+$last_id = mysqli_insert_id($connect);
+$target_dir = "upload/".$last_id."/";
+$target_file = $target_dir . basename($_FILES['image']['name']);
+
+
 
 //File
 
@@ -121,24 +123,46 @@ if($_FILES['file']['name']){
 
 
 
- // exit();
+  //exit();
 
-$sql = "INSERT INTO registertable2 (username, email,address,mobile,division,district,upozila,language,sscversity,sscboard,sscresult,hscversity,hscboard,hscresult,gdversity,gdboard,gdresult,msversity,msboard,msresult,image,file) VALUES ('$username','$email','$address','$mobile','$division','$district','$upozila','$language','$sscversity','$sscboard','$sscresult','$hscversity','$hscboard','$hscresult','$gdversity','$gdboard','$gdresult','$msversity','$msboard','$msresult','$image','$file')";
-
+$sql = "INSERT INTO registertable2 (username, email,address,mobile,division,district,upozila,language,sscversity,sscboard,sscresult,hscversity,hscboard,hscresult,gdversity,gdboard,gdresult,msversity,msboard,msresult,image,file) VALUES ('$username','$email','$address','$mobile','$division','$district','$upozila','$language','$sscversity','$sscboard','$sscresult','$hscversity','$hscboard','$hscresult','$gdversity','$gdboard','$gdresult','$msversity','$msboard','$msresult','$target_file','$file')";
 
   	
 	// Run SQL query
-  	$query=mysqli_query($connect, $sql) or die(mysql_error($connect));
+$query=mysqli_query($connect, $sql) or die(mysql_error($connect));
 
-  	 if (mysqli_query($connect, $sql))
-  	  {
-  $last_id = mysqli_insert_id($connect);
+
+if (mysqli_query($connect, $sql))
+  {
+$last_id = mysqli_insert_id($connect);
   echo "New record created successfully. Last inserted ID is: " . $last_id;
 } else {
   echo "Error: " . $sql . "<br>" . mysqli_error($connect);
 }
 
 
+//image
+$image=$_FILES['image']['name'];
+$imageTmpName=$_FILES['image']['tmp_name'];
+if(!empty($_FILES['image']['tmp_name'])){
+$target_dir = "upload/".$last_id."/";
+$target_file = $target_dir . basename($_FILES['image']['name']);
+// $uploadOk = 1;
+// $imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
+
+if (!file_exists($target_dir)) {
+mkdir($target_dir, 0777);
+        }
+
+ if (move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
+  echo "pic has been uploaded";
+ 
+   } else {
+  echo "Sorry, there was an error uploading your file.";
+    
+                  }
+       
+ }
 
 
  $training_name= $_POST['training_name'] ;
@@ -176,6 +200,10 @@ foreach($items as $item){
 
 
 }
+
+
+
+
 
 
 
