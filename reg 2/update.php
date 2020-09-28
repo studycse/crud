@@ -6,6 +6,8 @@ include 'dbcon.php';
 
 
 if (isset($_POST['update'])) {
+	//print_r($_POST);
+	//exit();
 
 $id=$_GET['id'];
 $username=$_POST['username'];
@@ -28,21 +30,139 @@ $gdresult=$_POST['gdresult'];
 $msversity=$_POST['msversity'];
 $msboard=$_POST['msboard'];
 $msresult=$_POST['msresult'];
-$file=$_FILES['file']['name'];
 $image=$_FILES['image']['name'];
+$file=$_FILES['file']['name'];
+
+//image
+if (isset($_GET['id'])) {
+$id=$_GET['id'];
+
+
+///start unlink image
+
+	$sql="SELECT * FROM registertable2 WHERE id=$id ";
+
+	$result=mysqli_query($connect,$sql);
+
+	$row = mysqli_fetch_array($result);
+
+  if (file_exists($row['image'])) {
+
+    unlink($row['image']);
+   // echo 'File '.$row['image'].' has been deleted';
+  } else {
+    echo 'Could not delete '.$row['image'].', file does not exist';
+  }
+
+/////// end unlink image
+
+
+
+$image=$_FILES['image']['name'];
+$imageTmpName=$_FILES['image']['tmp_name'];
+$target_dir = "upload/".$id."/";
+$target_file = $target_dir . basename($image);
+
+
+///////  upload images
+if (!file_exists($target_dir)) 
+{
+
+		mkdir($target_dir, 0777);
+
+		if (move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
+
+			echo 'file uplode';
+ 
+	   } 
+	   else {
+	  		echo "Sorry, there was an error uploading your file.";    
+	       
+	 	}
+}
+else
+{
+ if (move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
+ 
+   } else {
+  		echo "Sorry, there was an error uploading your file.";        }
+       
+ }
+
+}
+
+//// end upload images
+
+
 
 		
-$updatequery= "UPDATE registertable2 SET id=$id ,username='$username' ,email='$email',address='$address',mobile='mobile',division='$division', district='$district', upozila='$upozila', language='$language', sscversity='$sscversity', sscboard='$sscboard', sscresult='$sscresult', hscversity='$hscversity', hscboard='$hscboard', hscresult='$hscresult', gdversity='$gdversity', gdboard='$gdboard', gdresult='$gdresult', msversity='$msversity', msboard='$msboard', msresult='$msresult', image='$image', file='$file' WHERE id=$id";
+$updatequery= "UPDATE registertable2 SET id=$id ,username='$username' ,email='$email',address='$address',mobile='mobile',division='$division', district='$district', upozila='$upozila', language='$language', sscversity='$sscversity', sscboard='$sscboard', sscresult='$sscresult', hscversity='$hscversity', hscboard='$hscboard', hscresult='$hscresult', gdversity='$gdversity', gdboard='$gdboard', gdresult='$gdresult', msversity='$msversity', msboard='$msboard', msresult='$msresult', image='$target_file', file='$file' WHERE id=$id";
 
 $query= mysqli_query($connect,$updatequery);
+
+//  training id update part--------------
+
+
+if (isset($_GET['id'])) {
+    $id=$_GET['id'];
+    //$det='DELETE FROM `training` WHERE ref_master_id ='.$targetID;
+
+    $delete="DELETE FROM training WHERE ref_master_id =$id " ;
+
+     $query= mysqli_query($connect, $delete) or die(mysql_error($connect));
+
+
+ $training_name= $_POST['training_name'] ;
+ $organization = $_POST['organization'] ;
+ $details = $_POST['details'];
+
+
+ $items = array();
+
+ $size = count($training_name);
+
+ for($i = 0 ; $i < $size ; $i++){
+   $items[$i] = array(
+   	 "ref_master_id" =>  $id ,
+      "training_name"     => $training_name[$i], 
+      "organization"    => $organization[$i], 
+      "details"       => $details[$i]
+   );
+ }
+
+$values = array();
+foreach($items as $item){
+	//print_r($item) ;
+  $values[] = "('{$item['ref_master_id']}','{$item['training_name']}', '{$item['organization']}', '{$item['details']}')";
+
+  $a=$item['ref_master_id'];
+  $b=$item['training_name'];
+  $c=$item['organization'];
+  $d=$item['details'];
+
+    $insert="INSERT INTO training (ref_master_id,training_name,organization,details) VALUES ('$a','$b','$c','$d')";
+
+  $query= mysqli_query($connect, $insert) or die(mysql_error($connect));
+
+
+
+}
+
+print_r($item);
+   
+}
+
 			
 if($query==TRUE){
 header('location:page.php');
 }else{
-echo "Error:" .$updatequery ."<br>" .$connect->error;
+echo "Error:" .$query ."<br>" .$connect->error;;
 
 	}
 }
+
+
+
 if(isset($_GET['id'])){
 
 $id=$_GET['id'];
@@ -84,70 +204,6 @@ $id=$row['id'];
 
 
 ?>
-
-<?php
-if (isset($_GET['ref_master_id'])) {
-    $targetID = $_GET['ref_master_id'];
-    //$det='DELETE FROM `training` WHERE ref_master_id ='.$targetID;
- //echo $targetID;
-// exit;
-    $delete="DELETE FROM training WHERE ref_master_id ='.$targetID" ;
-
-     $query= mysqli_query($connect, $delete) or die(mysql_error($connect));
-
-	 if (mysqli_query($connect, $sql))
-  	  {
-  $last_id = mysqli_insert_id($connect);
-  echo "New record created successfully. Last inserted ID is: " . $last_id;
-} else {
-  echo "Error: " . $sql . "<br>" . mysqli_error($connect);
-}
-
- $training_name= $_POST['training_name'] ;
- $organization = $_POST['organization'] ;
- $details = $_POST['details'];
-
-
- $items = array();
-
- $size = count($training_name);
-
- for($i = 0 ; $i < $size ; $i++){
-   $items[$i] = array(
-   	 "ref_master_id" =>  $last_id ,
-      "training_name"     => $training_name[$i], 
-      "organization"    => $organization[$i], 
-      "details"       => $details[$i]
-   );
- }
-
-$values = array();
-foreach($items as $item){
-	//print_r($item) ;
-  $values[] = "('{$item['ref_master_id']}','{$item['training_name']}', '{$item['organization']}', '{$item['details']}')";
-
-  $a=$item['ref_master_id'];
-  $b=$item['training_name'];
-  $c=$item['organization'];
-  $d=$item['details'];
-
-    $insert="INSERT INTO training (ref_master_id,training_name,organization,details) VALUES ('$a','$b','$c','$d')";
-
-  $query= mysqli_query($connect, $insert) or die(mysql_error($connect));
-
-
-
-}
-   
-}
-
-
-
-?>
-
-
-
-
 
 
 <html>
